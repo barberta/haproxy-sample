@@ -1,0 +1,45 @@
+global
+  log       127.0.0.1 local0
+  log       127.0.0.1 local1 notice
+  chroot    <%= node['haproxy']['global_chroot'] %>
+  pidfile   <%= node['haproxy']['global_pidfile'] %>
+  maxconn   <%= node['haproxy']['global_maxconn'] %>
+  user      <%= node['haproxy']['global_user'] %>
+  group     <%= node['haproxy']['global_group'] %>
+  <% if node['haproxy']['global_daemon'] -%>
+  daemon
+  <% end -%>
+
+  <% if node['haproxy']['global_stats_path'] -%>
+  stats socket <%= node['haproxy']['global_stats_path'] %>
+  <% end -%>
+
+defaults
+  mode                    <%= node['haproxy']['default_mode'] %>
+  log                     <%= node['haproxy']['default_log'] %>
+  <% node['haproxy']['default_options'].each do | option | -%>
+  option                  <%= option %>
+  <% end -%>
+  retries                 <%= node['haproxy']['default_retries'] %>
+  <% node['haproxy']['default_timeout'].each do | type, value | -%>
+  timeout <%= type %>     <%= value %>
+  <% end -%>
+  maxconn                 <%= node['haproxy']['default_maxconn'] %>
+
+<% @frontends.each do | frontend | -%>
+frontend <%= frontend['name'] %>
+  bind <%= frontend['bind_ip'] %>:<%= frontend['bind_port'] %>
+    default_backend <%= frontend['default_backend'] %>
+<% end -%>
+
+<% @backends.each do | backend | -%>
+backend <%= backend['name'] %>
+  mode <%= backend['mode'] %>
+  balance <%= backend['balance_type'] %>
+  <% backend['backend_options'].each do | option | -%>
+  option <%= option %>
+  <% end -%>
+  <% backend['servers'].each do | server | -%>
+  <%= server %>
+  <% end -%>
+<% end -%>

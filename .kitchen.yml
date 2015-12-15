@@ -1,0 +1,25 @@
+---
+driver:
+  name: vagrant
+  network:
+    - ["forwarded_port", {guest: 80, host: 8080}]
+
+provisioner:
+  name: chef_zero
+
+# Uncomment the following verifier to leverage Inspec instead of Busser (the
+# default verifier)
+# verifier:
+#  name: inspec
+
+platforms:
+  - name: centos-6.7
+    driver_config:
+      box: opscode-centos-6.7
+      box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.7_chef-provisionerless.box
+
+suites:
+  - name: default
+    run_list:
+      - recipe[haproxy-sample::default]
+    attributes:
