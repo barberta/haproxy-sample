@@ -7,13 +7,19 @@
 require 'spec_helper'
 
 describe 'haproxy-sample::install_haproxy' do
+  let(:version) { '1.5.4' }
   let(:chef_run) do
-    runner = ChefSpec::ServerRunner.new
-    runner.converge(described_recipe)
+    runner = ChefSpec::ServerRunner.new do | node |
+      node.set['haproxy']['version'] = version
+    end.converge(described_recipe)
   end
 
   it 'installs the haproxy package' do
     expect(chef_run).to install_package 'haproxy'
+  end
+
+  it 'installs a specified version of the haproxy package' do
+    expect(chef_run).to install_package('haproxy').with_version(version)
   end
 
   it 'enables the service haproxy' do

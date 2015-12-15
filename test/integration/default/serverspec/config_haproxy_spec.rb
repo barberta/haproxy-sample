@@ -23,6 +23,6 @@ describe 'haproxy-sample::config_haproxy' do
   end
 
   describe command('curl localhost:80') do
-    its(:stdout) { should match(%r{<TITLE>302 Moved</TITLE>}) }
+    its(:stdout) { should match(%r{http://www.google.com/}) }
   end
 end
